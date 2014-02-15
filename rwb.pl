@@ -77,8 +77,8 @@ use Time::ParseDate;
 #
 # You need to override these for access to your database
 #
-my $dbuser="hsb732";
-my $dbpasswd="z9XcmG7zo";
+my $dbuser="pfw495";
+my $dbpasswd="zrTBk0tf8";
 
 
 #
