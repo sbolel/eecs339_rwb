@@ -474,7 +474,58 @@ if ($action eq "near") {
 
 
 if ($action eq "invite-user") { 
-  print h2("Invite User Functionality Is Unimplemented");
+  print h2("Invite User");
+
+  # Get list of available permissions
+  my @permissions_data;
+  eval { @permissions_data = ExecSQL($dbuser, $dbpasswd, "select action from RWB_PERMISSIONS where name='$user'", "COL"); };
+
+  # Display HTML form
+  print start_form(-name=>'invite'),p,p,
+  "Email: ", textfield(-name=>'email'),p,
+  hidden(-name=>'run',default=>['1']),
+  hidden(-name=>'act',default=>['invite-user']),h3("Select user permissions:"),
+  checkbox_group(-name=>'permissions_list',
+    -multiple=>'true',
+    -values=>[@permissions_data],
+    -linebreak=>'true'
+    ),p,
+  submit,
+  end_form;
+
+  if (defined(param("email"))) {
+
+    # Generate random auth_token for invitation
+    my $auth_token = rand();
+    eval { ExecSQL($dbuser,$dbpasswd,
+      "insert into rwb_invites (nonce) values (?)",undef, $auth_token);};
+
+    # Get inputted Email address and selected permissions
+    my $email_input = param("email");
+    my $permissions_input = join(',', param('permissions_list'));
+
+    # Build SMTP Email
+    my $message_headers = "Content-Type: text/html\nTo: " . $email_input . "\n" . "Subject: You have been invited to Red, White, and Blue\n\n";
+    my $message_content = "<h2>Hello! You have been invited to RWB on Murphy!</h2>Follow this link to join RWB: <br/>http://". $ENV{'HTTP_HOST'} ."/~hsb732/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input";
+    my $message_permissions = " <br/><p>Your permissions: </p><p>" . $permissions_input . "</p>";
+    $message_content = $message_content . $message_permissions;
+
+    # Create SMTP email
+    use Net::SMTP;
+    my $email_obj = Net::SMTP->new('localhost');
+
+    # Send Email
+    $email_obj->mail($ENV{USER});
+    $email_obj->to($email_input);
+    $email_obj->data();
+    $email_obj->datasend($message_headers);
+    $email_obj->datasend($message_content);
+    $email_obj->dataend();
+    print "Email was sent!";
+  }
+  else {   # if email is not defined
+    print "Email is not entered.";
+  }
 }
 
 if ($action eq "give-opinion-data") { 
