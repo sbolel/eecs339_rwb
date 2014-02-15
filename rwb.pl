@@ -273,7 +273,8 @@ print "<body style=\"height:100\%;margin:0\">";
 # This tells the web browser to render the page in the style
 # defined in the css file
 #
-print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
+  print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";  
+# print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
   
 
 print "<center>" if !$debug;
@@ -323,13 +324,63 @@ if ($action eq "base") {
   #
   # Google maps API, needed to draw the map
   #
-  print "<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js\" type=\"text/javascript\"></script>";
+  print "<script src=\"http://code.jquery.com/jquery-1.7.min.js\" type=\"text/javascript\"></script>";
   print "<script src=\"http://maps.google.com/maps/api/js?sensor=false\" type=\"text/javascript\"></script>";
-  
+  print "<script src=\"bootstrap.js\" type=\"text/javascript\"></script>";
   #
   # The Javascript portion of our app
   #
   print "<script type=\"text/javascript\" src=\"rwb.js\"> </script>";
+
+  if ($user eq "anon") {
+  print "<div class=\"navbar\">
+          <div class=\"navbar-inner\">
+            <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
+            <ul class=\"nav\">
+              <li class=\"pull-right\"><a href=\"rwb.pl?act=login\">Login</a></li>
+            </ul>
+          </div>
+        </div>";
+  } else {
+    my $user_mod_html = " ";
+    if (UserCan($user,"give-opinion-data")) {
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></li>";
+    }
+    if (UserCan($user,"give-cs-ind-data")) {
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=give-cs-ind-data\">Geolocate Individual Contributors</a></li>";
+    }
+    if (UserCan($user,"manage-users") || UserCan($user,"invite-users")) {
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=invite-user\">Invite User</a></li>";
+    }
+    if (UserCan($user,"manage-users") || UserCan($user,"add-users")) { 
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=add-user\">Add User</a></li>";
+    } 
+    if (UserCan($user,"manage-users")) { 
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=delete-user\">Delete User</a></li>";
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=add-perm-user\">Add User Permission</a></li>";
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=revoke-perm-user\">Revoke User Permission</a></li>";
+    }
+    $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=logout&run=1\">Logout</a></li>";
+    print "<div class=\"navbar\">
+          <div class=\"navbar-inner\">
+            <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
+            <div class=\"btn-group pull-right\">
+                <a href=\"#\" class=\"btn dropdown-toggle\" data-toggle=\"dropdown\">
+                  $user
+                  <b class=\"caret\"></b>
+                </a>
+                <ul class=\"dropdown-menu\">
+                  $user_mod_html
+                </ul>
+            </div>
+          </div>
+        </div>";
+  }
+
+  #
+  # User mods
+  #
+  #
 
 
 
@@ -362,33 +413,7 @@ if ($action eq "base") {
 # height=1024 width=1024 id=\"info\" name=\"info\" onload=\"UpdateMap()\"></iframe>";
   
 
-  #
-  # User mods
-  #
-  #
-  if ($user eq "anon") {
-    print "<p>You are anonymous, but you can also <a href=\"rwb.pl?act=login\">login</a></p>";
-  } else {
-    print "<p>You are logged in as $user and can do the following:</p>";
-    if (UserCan($user,"give-opinion-data")) {
-      print "<p><a href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></p>";
-    }
-    if (UserCan($user,"give-cs-ind-data")) {
-      print "<p><a href=\"rwb.pl?act=give-cs-ind-data\">Geolocate Individual Contributors</a></p>";
-    }
-    if (UserCan($user,"manage-users") || UserCan($user,"invite-users")) {
-      print "<p><a href=\"rwb.pl?act=invite-user\">Invite User</a></p>";
-    }
-    if (UserCan($user,"manage-users") || UserCan($user,"add-users")) { 
-      print "<p><a href=\"rwb.pl?act=add-user\">Add User</a></p>";
-    } 
-    if (UserCan($user,"manage-users")) { 
-      print "<p><a href=\"rwb.pl?act=delete-user\">Delete User</a></p>";
-      print "<p><a href=\"rwb.pl?act=add-perm-user\">Add User Permission</a></p>";
-      print "<p><a href=\"rwb.pl?act=revoke-perm-user\">Revoke User Permission</a></p>";
-    }
-    print "<p><a href=\"rwb.pl?act=logout&run=1\">Logout</a></p>";
-  }
+
 
 }
 
@@ -474,6 +499,8 @@ if ($action eq "near") {
 
 
 if ($action eq "invite-user") { 
+  print "<script src=\"bootstrap.js\" type=\"text/javascript\"></script>";
+  print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";
   print h2("Invite User");
 
   # Get list of available permissions
@@ -506,9 +533,9 @@ if ($action eq "invite-user") {
 
     # Build SMTP Email
     my $message_headers = "Content-Type: text/html\nTo: " . $email_input . "\n" . "Subject: You have been invited to Red, White, and Blue\n\n";
-    my $message_content = "<h2>Hello! You have been invited to RWB on Murphy!</h2>Follow this link to join RWB: <br/>http://". $ENV{'HTTP_HOST'} ."/~hsb732/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input";
-    my $message_permissions = " <br/><p>Your permissions: </p><p>" . $permissions_input . "</p>";
-    $message_content = $message_content . $message_permissions;
+    my $message_body = "<h2>Hello!</h2><br/><h3>$user has invited you to RWB on Murphy!</h3><p><a href=\"http://". $ENV{'HTTP_HOST'} ."/~hsb732/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input\">Click here to join.</a></p>";
+    my $message_permissions = "<br/><div id=\"permissions\" style=\"font-size:8px;\"><p>Your permissions:</p><p>" . $permissions_input . "</p></div>";
+    my $message_content = $message_headers . $message_body . $message_permissions;
 
     # Create SMTP email
     use Net::SMTP;
@@ -518,13 +545,12 @@ if ($action eq "invite-user") {
     $email_obj->mail($ENV{USER});
     $email_obj->to($email_input);
     $email_obj->data();
-    $email_obj->datasend($message_headers);
     $email_obj->datasend($message_content);
     $email_obj->dataend();
-    print "Email was sent!";
+    print "<div class=\"alert alert-success\" style=\"width:50%;\">Email was sent!</div>";
   }
   else {   # if email is not defined
-    print "Email is not entered.";
+    print "<div class=\"alert alert-error\" style=\"width:50%;\">Email is not entered.</div>";
   }
 }
 

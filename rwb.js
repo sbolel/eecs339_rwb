@@ -136,5 +136,3 @@ function Start(location)
   navigator.geolocation.watchPosition(Reposition);
 
 }
-
-
