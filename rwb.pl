@@ -344,7 +344,7 @@ if ($action eq "base") {
   } else {
     my $user_mod_html = " ";
     if (UserCan($user,"give-opinion-data")) {
-      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></li>";
+      $user_mod_html = $user_mod_html . "<li><a id=\"give-opinion-link\" href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></li>";
     }
     if (UserCan($user,"give-cs-ind-data")) {
       $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=give-cs-ind-data\">Geolocate Individual Contributors</a></li>";
@@ -555,7 +555,42 @@ if ($action eq "invite-user") {
 }
 
 if ($action eq "give-opinion-data") { 
-  print h2("Giving Location Opinion Data Is Unimplemented");
+  if (!UserCan($user,"add-users") && !UserCan($user,"manage-users")) { 
+    print h2('You do not have the required permissions to add users.');
+  } else {
+    if (!$run) { 
+      my $lat = param('lat');
+      my $long = param('long');
+      print start_form(-name=>'GiveOpinion'),
+  h2('Give Opinion'),
+    "Color: ", textfield(-name=>'color'),
+      p('Color must be between -1 (red) and +1 (blue).'),
+      hidden(-name=>'run',-default=>['1']),
+      hidden(-name=>'act',-default=>['give-opinion-data']),
+      hidden(-name=>'lat',-default=>[$lat]),
+      hidden(-name=>'long',-default=>[$long]),
+        submit,
+          end_form,
+            hr;
+    } else {
+      my $color = param('color');
+      my $lat = param('lat');
+      my $long = param('long');
+
+      my $error;
+      if ($error) { 
+        print "Can't add user because: $error";
+      } else {
+        if ($color > 1 || $color < -1) {
+          print "Color must be between -1 and 1";
+        } else {
+          ExecSQL($dbuser, $dbpasswd, "insert into rwb_opinions (submitter, color, latitude, longitude) values (?, ?, ?, ?)", undef, $user, $color, $lat, $long);
+          print "Inserted opinion of $color at latitude: $lat and longitude: $long";
+        }
+      }
+    }
+  }
+  print "<p><a href=\"rwb.pl?act=base&run=1\">Return</a></p>";
 }
 
 if ($action eq "give-cs-ind-data") { 

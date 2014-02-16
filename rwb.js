@@ -92,6 +92,11 @@ function ViewShift()
    
     // debug status flows through by cookie
     $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=committees,candidates", NewData);
+
+    // Update the give opinion date link with the latitude and longitude of the center of the map
+    var latitude = (ne.lat() + sw.lat()) / 2;
+    var longitude = (ne.lng() + sw.lng()) / 2;
+    $("#give-opinion-link").attr('href',"rwb.pl?act=give-opinion-data&lat="+latitude+"&long="+longitude);
 }
 
 
