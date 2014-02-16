@@ -18,19 +18,20 @@ if (navigator.geolocation)  {
 function UpdateMapById(id, tag) {
 
     var target = document.getElementById(id);
+    if (target != null) {
     var data = target.innerHTML;
-
+    //console.log("Data: " + data.toString());
     var rows  = data.split("\n");
    
     for (i in rows) {
 	var cols = rows[i].split("\t");
 	var lat = cols[0];
 	var long = cols[1];
-
+	//console.log("Updating index: " + i.toString());
 	markers.push(new google.maps.Marker({ map:map,
 						    position: new google.maps.LatLng(lat,long),
 						    title: tag+"\n"+cols.join("\n")}));
-	
+    } 
     }
 }
 
@@ -53,9 +54,9 @@ function UpdateMap()
     ClearMarkers();
 
     UpdateMapById("committee_data","COMMITTEE");
-    //UpdateMapById("candidate_data","CANDIDATE");
-    //UpdateMapById("individual_data", "INDIVIDUAL");
-    //UpdateMapById("opinion_data","OPINION");
+    UpdateMapById("candidate_data","CANDIDATE");
+    UpdateMapById("individual_data", "INDIVIDUAL");
+    UpdateMapById("opinion_data","OPINION");
 
 
     color.innerHTML="Ready";
@@ -137,4 +138,51 @@ function Start(location)
 
 }
 
+$("#opinion").live('change', function() {
+  if($(this).is(':checked')) {	
+    ClearMarkers();
+
+    var bounds = map.getBounds();
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+   
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=opinions",NewData);
+   }
+});
+
+$("#committee").live('change', function() {
+  if($(this).is(':checked')) {	
+    ClearMarkers();
+
+    var bounds = map.getBounds();
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+   
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=committees",NewData);
+   }
+});
+
+$("#candidate").live('change', function() {
+  if($(this).is(':checked')) {	
+    ClearMarkers();
+
+    var bounds = map.getBounds();
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+   
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=candidates",NewData);
+   }
+});
+
+$("#individual").live('change', function() {
+  if($(this).is(':checked')) {	
+    ClearMarkers();
+
+    var bounds = map.getBounds();
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+   
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=individuals",NewData);
+   }
+});
 

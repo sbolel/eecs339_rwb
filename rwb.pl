@@ -270,7 +270,7 @@ print "<body style=\"height:100\%;margin:0\">";
 #
 #print "<meta name=\"viewport\" content=\"width=device-width\" />\n";
 
-# This tells the web browser to render the page in the style
+# This tells the web browser to render the page in the styl>e
 # defined in the css file
 #
 print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
@@ -358,9 +358,14 @@ if ($action eq "base") {
     print "<div id=\"data\" style=\"display: none;\"></div>";
   }
 
-
-# height=1024 width=1024 id=\"info\" name=\"info\" onload=\"UpdateMap()\"></iframe>";
-  
+  #Filter map options	
+  print "Filter data options: <p>";
+  print start_form(-name=>'Data Filters'), 
+	checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
+	checkbox(-name=>'committee',-id=>'committee',-value=>'yes',-selected=>0,-label=>'Committee Data'),
+	checkbox(-name=>'candidate',-id=>'candidate',-value=>'yes',-selected=>0,-label=>'Candidate Data'),
+	checkbox(-name=>'individual',-id=>'individual',-value=>'yes',-selected=>0,-label=>'Individual Data'), 
+	end_form,hr; 
 
   #
   # User mods
@@ -482,7 +487,35 @@ if ($action eq "give-opinion-data") {
 }
 
 if ($action eq "give-cs-ind-data") { 
-  print h2("Giving Crowd-sourced Individual Geolocations Is Unimplemented");
+  #print h2("Giving Crowd-sourced Individual Geolocations Is Unimplemented");
+
+  if (!UserCan($user,"query-cs-ind-data")) { 
+    print h2('You do not have the required permissions to query crowed sourced individual deolocation data.');
+  } else {
+    if (!$run) { 
+      print start_form(-name=>'LocateUser'),
+	h2('Locate User'),
+	  "Name: ", textfield(-name=>'name'),
+	    p,
+		      hidden(-name=>'run',-default=>['1']),
+			hidden(-name=>'act',-default=>['add-user']),
+			  submit,
+			    end_form,
+			      hr;
+    } else {
+      my $name=param('name');
+      my $email=param('email');
+      my $password=param('password');
+      my $error;
+      #$error=UserAdd($name,$password,$email,$user);
+      if ($error) { 
+	print "Can't add user because: $error";
+      } else {
+	print "Added user $name $email as referred by $user\n";
+      }
+    }
+  }
+  print "<p><a href=\"rwb.pl?act=base&run=1\">Return</a></p>";
 }
 
 #
@@ -555,7 +588,7 @@ if ($action eq "delete-user") {
     } else {
       my $name=param('name');
       my $error;
-      $error=UserDelete($name);
+      $error=UserDel($name);
       if ($error) { 
 	print "Can't delete user because: $error";
       } else {
