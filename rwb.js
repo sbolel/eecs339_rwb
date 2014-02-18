@@ -90,9 +90,10 @@ function ViewShift()
 
     color.innerHTML="<b><blink>Querying...("+ne.lat()+","+ne.lng()+") to ("+sw.lat()+","+sw.lng()+")</blink></b>";
     color.style.backgroundColor='white';
-   
+
+    var what = findCheckboxes();   
     // debug status flows through by cookie
-    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=committees,candidates", NewData);
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what, NewData);
 }
 
 
@@ -138,51 +139,68 @@ function Start(location)
 
 }
 
-$("#opinion").live('change', function() {
-  if($(this).is(':checked')) {	
-    ClearMarkers();
+function findCheckboxes() {
+  var what = "";
 
+  if ($("#committee").is(':checked')) {
+    if (what == "") { what = "committees"; }
+    else { what += ",committees"; }
+  }
+  if ($("#opinion").is(':checked')) {
+    if (what == "") { what = "opinions"; }
+    else { what += ",opinions"; }
+  }
+  if ($("#candidate").is(':checked')) {
+    if (what == "") { what = "candidates"; }
+    else { what += ",candidates"; }
+  }
+  if ($("#individual").is(':checked')) {
+    if (what == "") { what = "individuals"; }
+    else { what += ",individuals"; }
+  }  
+  return what;
+}
+
+$("#opinion").live('change', function() {
     var bounds = map.getBounds();
     var ne = bounds.getNorthEast();
     var sw = bounds.getSouthWest();
-   
-    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=opinions",NewData);
-   }
+    var what = findCheckboxes();
+
+    ClearMarkers();
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what,NewData);
 });
 
 $("#committee").live('change', function() {
-  if($(this).is(':checked')) {	
     ClearMarkers();
 
     var bounds = map.getBounds();
     var ne = bounds.getNorthEast();
     var sw = bounds.getSouthWest();
+    var what = findCheckboxes();
    
-    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=committees",NewData);
-   }
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what,NewData);
 });
 
 $("#candidate").live('change', function() {
-  if($(this).is(':checked')) {	
     ClearMarkers();
 
     var bounds = map.getBounds();
     var ne = bounds.getNorthEast();
     var sw = bounds.getSouthWest();
-   
-    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=candidates",NewData);
-   }
+    var what = findCheckboxes();  
+ 
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what,NewData);
 });
 
 $("#individual").live('change', function() {
-  if($(this).is(':checked')) {	
     ClearMarkers();
 
     var bounds = map.getBounds();
     var ne = bounds.getNorthEast();
     var sw = bounds.getSouthWest();
+    var what = findCheckboxes();
    
-    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what=individuals",NewData);
-   }
+    $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what,NewData);
 });
 

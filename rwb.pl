@@ -487,35 +487,7 @@ if ($action eq "give-opinion-data") {
 }
 
 if ($action eq "give-cs-ind-data") { 
-  #print h2("Giving Crowd-sourced Individual Geolocations Is Unimplemented");
-
-  if (!UserCan($user,"query-cs-ind-data")) { 
-    print h2('You do not have the required permissions to query crowed sourced individual deolocation data.');
-  } else {
-    if (!$run) { 
-      print start_form(-name=>'LocateUser'),
-	h2('Locate User'),
-	  "Name: ", textfield(-name=>'name'),
-	    p,
-		      hidden(-name=>'run',-default=>['1']),
-			hidden(-name=>'act',-default=>['add-user']),
-			  submit,
-			    end_form,
-			      hr;
-    } else {
-      my $name=param('name');
-      my $email=param('email');
-      my $password=param('password');
-      my $error;
-      #$error=UserAdd($name,$password,$email,$user);
-      if ($error) { 
-	print "Can't add user because: $error";
-      } else {
-	print "Added user $name $email as referred by $user\n";
-      }
-    }
-  }
-  print "<p><a href=\"rwb.pl?act=base&run=1\">Return</a></p>";
+  print h2("Giving Crowd-sourced Individual Geolocations Is Unimplemented");
 }
 
 #
