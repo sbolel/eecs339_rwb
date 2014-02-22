@@ -396,7 +396,20 @@ if ($action eq "base") {
   #
   print "<div id=\"map\" style=\"width:100\%; height:80\%\"></div>";
   
+  print "<div id=\"controls\" style=\"float: right;position: absolute;right: 40px;bottom: 85px;padding: 0 20px 20px 20px;background-color: #fafafa;border-radius: 5px;overflow: hidden;height: 130px;\">";
+
+  #Filter map options 
+  print "<h5>Filter data options:</h5> <p>";
   
+  print start_form(-name=>'Data Filters'), 
+  checkbox(-name=>'committee',-id=>'committee',-value=>'yes',-selected=>0,-label=>'Committee Data'),
+  checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
+  checkbox(-name=>'candidate',-id=>'candidate',-value=>'yes',-selected=>0,-label=>'Candidate Data'),
+  checkbox(-name=>'individual',-id=>'individual',-value=>'yes',-selected=>0,-label=>'Individual Data'), 
+  end_form,hr; 
+
+
+  print "</div>";
   #
   # And a div to populate with info about nearby stuff
   #
@@ -408,13 +421,6 @@ if ($action eq "base") {
     # invisible otherwise
     print "<div id=\"data\" style=\"display: none;\"></div>";
   }
-
-
-# height=1024 width=1024 id=\"info\" name=\"info\" onload=\"UpdateMap()\"></iframe>";
-  
-
-
-
 }
 
 #
@@ -667,7 +673,7 @@ if ($action eq "delete-user") {
     } else {
       my $name=param('name');
       my $error;
-      $error=UserDelete($name);
+      $error=UserDel($name);
       if ($error) { 
 	print "Can't delete user because: $error";
       } else {
