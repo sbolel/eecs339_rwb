@@ -396,7 +396,7 @@ if ($action eq "base") {
   #
   print "<div id=\"map\" style=\"width:100\%; height:80\%\"></div>";
   
-  print "<div id=\"controls\" style=\"float: right;position: absolute;right: 40px;bottom: 85px;padding: 0 20px 20px 20px;background-color: #fafafa;border-radius: 5px;overflow: hidden;height: 130px;\">";
+  print "<div id=\"controls\" style=\"float: right;position: absolute;right: 40px;bottom: 85px;padding: 0 20px 20px 20px;background-color: #fafafa;border-radius: 5px;overflow: scroll;height: 500px; width: 200px;\">";
 
   #Filter map options 
   print "<h5>Filter data options:</h5> <p>";
@@ -406,10 +406,27 @@ if ($action eq "base") {
   checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
   checkbox(-name=>'candidate',-id=>'candidate',-value=>'yes',-selected=>0,-label=>'Candidate Data'),
   checkbox(-name=>'individual',-id=>'individual',-value=>'yes',-selected=>0,-label=>'Individual Data'), 
-  end_form,hr; 
+  end_form;
 
+#  print start_form(-name=>'Cycle'),
+#  popup_menu(-name=>'cycle', id=>'cycle',
+#    -values => [],
+#    -default => '',
+#    -labels => \%labels
+#  );
 
-  print "</div>";
+my @cycles = ExecSQL($dbuser, $dbpasswd, "select distinct cycle from cs339.committee_master natural join cs339.cmte_id_to_geo order by cycle DESC");
+
+print "<h5>Election Cycles:</h5> <p>";
+# I tried to use the Perl form, but Perl sucks and it confused me -- PW
+print '<form method="post" action="/~pfw495/rwb/rwb.pl" enctype="multipart/form-data" name="Election Cycles" id="election-cycle-checkboxes">';
+foreach (@cycles) {
+  print "<label><input type=\"checkbox\" name=\"@{$_}\" value=\"@{$_}\" id=\"committee\">@{$_}</label><label>";
+}
+print '</form>';
+
+print "</div>";
+
   #
   # And a div to populate with info about nearby stuff
   #
@@ -449,7 +466,14 @@ if ($action eq "near") {
   my %what;
   
   $format = "table" if !defined($format);
-  $cycle = "1112" if !defined($cycle);
+
+  if (!defined($cycle) || $cycle == "") {
+    $cycle = "cycle=1112"
+  } else {
+    $cycle = 'cycle=' . $cycle;
+    $cycle =~ s/,/ or cycle=/g;
+    $cycle = "(" . $cycle . ")";
+  }
 
   if (!defined($whatparam) || $whatparam eq "all") { 
     %what = ( committees => 1, 
@@ -831,7 +855,8 @@ sub Committees {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval { 
-    @rows = ExecSQL($dbuser, $dbpasswd, "select latitude, longitude, cmte_nm, cmte_pty_affiliation, cmte_st1, cmte_st2, cmte_city, cmte_st, cmte_zip from cs339.committee_master natural join cs339.cmte_id_to_geo where cycle=? and latitude>? and latitude<? and longitude>? and longitude<?",undef,$cycle,$latsw,$latne,$longsw,$longne);
+    my $query = "select latitude, longitude, cmte_nm, cmte_pty_affiliation, cmte_st1, cmte_st2, cmte_city, cmte_st, cmte_zip from cs339.committee_master natural join cs339.cmte_id_to_geo where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<?";
+    @rows = ExecSQL($dbuser, $dbpasswd, $query, undef,$latsw,$latne,$longsw,$longne);
   };
   
   if ($@) { 
@@ -857,7 +882,8 @@ sub Candidates {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval { 
-    @rows = ExecSQL($dbuser, $dbpasswd, "select latitude, longitude, cand_name, cand_pty_affiliation, cand_st1, cand_st2, cand_city, cand_st, cand_zip from cs339.candidate_master natural join cs339.cand_id_to_geo where cycle=? and latitude>? and latitude<? and longitude>? and longitude<?",undef,$cycle,$latsw,$latne,$longsw,$longne);
+    my $query = "select latitude, longitude, cand_name, cand_pty_affiliation, cand_st1, cand_st2, cand_city, cand_st, cand_zip from cs339.candidate_master natural join cs339.cand_id_to_geo where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<?";
+    @rows = ExecSQL($dbuser, $dbpasswd, $query, undef, $latsw,$latne,$longsw,$longne);
   };
   
   if ($@) { 
@@ -886,7 +912,8 @@ sub Individuals {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval { 
-    @rows = ExecSQL($dbuser, $dbpasswd, "select latitude, longitude, name, city, state, zip_code, employer, transaction_amnt from cs339.individual natural join cs339.ind_to_geo where cycle=? and latitude>? and latitude<? and longitude>? and longitude<?",undef,$cycle,$latsw,$latne,$longsw,$longne);
+    my $query = "select latitude, longitude, name, city, state, zip_code, employer, transaction_amnt from cs339.individual natural join cs339.ind_to_geo where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<?";
+    @rows = ExecSQL($dbuser, $dbpasswd, $query,undef, $latsw,$latne,$longsw,$longne);
   };
   
   if ($@) { 
