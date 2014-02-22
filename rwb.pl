@@ -273,7 +273,8 @@ print "<body style=\"height:100\%;margin:0\">";
 # This tells the web browser to render the page in the style
 # defined in the css file
 #
-print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
+  print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";  
+# print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
   
 
 print "<center>" if !$debug;
@@ -323,13 +324,63 @@ if ($action eq "base") {
   #
   # Google maps API, needed to draw the map
   #
-  print "<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js\" type=\"text/javascript\"></script>";
+  print "<script src=\"http://code.jquery.com/jquery-1.7.min.js\" type=\"text/javascript\"></script>";
   print "<script src=\"http://maps.google.com/maps/api/js?sensor=false\" type=\"text/javascript\"></script>";
-  
+  print "<script src=\"bootstrap.js\" type=\"text/javascript\"></script>";
   #
   # The Javascript portion of our app
   #
   print "<script type=\"text/javascript\" src=\"rwb.js\"> </script>";
+
+  if ($user eq "anon") {
+  print "<div class=\"navbar\">
+          <div class=\"navbar-inner\">
+            <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
+            <ul class=\"nav\">
+              <li class=\"pull-right\"><a href=\"rwb.pl?act=login\">Login</a></li>
+            </ul>
+          </div>
+        </div>";
+  } else {
+    my $user_mod_html = " ";
+    if (UserCan($user,"give-opinion-data")) {
+      $user_mod_html = $user_mod_html . "<li><a id=\"give-opinion-link\" href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></li>";
+    }
+    if (UserCan($user,"give-cs-ind-data")) {
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=give-cs-ind-data\">Geolocate Individual Contributors</a></li>";
+    }
+    if (UserCan($user,"manage-users") || UserCan($user,"invite-users")) {
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=invite-user\">Invite User</a></li>";
+    }
+    if (UserCan($user,"manage-users") || UserCan($user,"add-users")) { 
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=add-user\">Add User</a></li>";
+    } 
+    if (UserCan($user,"manage-users")) { 
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=delete-user\">Delete User</a></li>";
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=add-perm-user\">Add User Permission</a></li>";
+      $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=revoke-perm-user\">Revoke User Permission</a></li>";
+    }
+    $user_mod_html = $user_mod_html . "<li><a href=\"rwb.pl?act=logout&run=1\">Logout</a></li>";
+    print "<div class=\"navbar\">
+          <div class=\"navbar-inner\">
+            <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
+            <div class=\"btn-group pull-right\">
+                <a href=\"#\" class=\"btn dropdown-toggle\" data-toggle=\"dropdown\">
+                  $user
+                  <b class=\"caret\"></b>
+                </a>
+                <ul class=\"dropdown-menu\">
+                  $user_mod_html
+                </ul>
+            </div>
+          </div>
+        </div>";
+  }
+
+  #
+  # User mods
+  #
+  #
 
 
 
@@ -345,7 +396,20 @@ if ($action eq "base") {
   #
   print "<div id=\"map\" style=\"width:100\%; height:80\%\"></div>";
   
+  print "<div id=\"controls\" style=\"float: right;position: absolute;right: 40px;bottom: 85px;padding: 0 20px 20px 20px;background-color: #fafafa;border-radius: 5px;overflow: hidden;height: 130px;\">";
+
+  #Filter map options 
+  print "<h5>Filter data options:</h5> <p>";
   
+  print start_form(-name=>'Data Filters'), 
+  checkbox(-name=>'committee',-id=>'committee',-value=>'yes',-selected=>0,-label=>'Committee Data'),
+  checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
+  checkbox(-name=>'candidate',-id=>'candidate',-value=>'yes',-selected=>0,-label=>'Candidate Data'),
+  checkbox(-name=>'individual',-id=>'individual',-value=>'yes',-selected=>0,-label=>'Individual Data'), 
+  end_form,hr; 
+
+
+  print "</div>";
   #
   # And a div to populate with info about nearby stuff
   #
@@ -357,39 +421,6 @@ if ($action eq "base") {
     # invisible otherwise
     print "<div id=\"data\" style=\"display: none;\"></div>";
   }
-
-
-# height=1024 width=1024 id=\"info\" name=\"info\" onload=\"UpdateMap()\"></iframe>";
-  
-
-  #
-  # User mods
-  #
-  #
-  if ($user eq "anon") {
-    print "<p>You are anonymous, but you can also <a href=\"rwb.pl?act=login\">login</a></p>";
-  } else {
-    print "<p>You are logged in as $user and can do the following:</p>";
-    if (UserCan($user,"give-opinion-data")) {
-      print "<p><a href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></p>";
-    }
-    if (UserCan($user,"give-cs-ind-data")) {
-      print "<p><a href=\"rwb.pl?act=give-cs-ind-data\">Geolocate Individual Contributors</a></p>";
-    }
-    if (UserCan($user,"manage-users") || UserCan($user,"invite-users")) {
-      print "<p><a href=\"rwb.pl?act=invite-user\">Invite User</a></p>";
-    }
-    if (UserCan($user,"manage-users") || UserCan($user,"add-users")) { 
-      print "<p><a href=\"rwb.pl?act=add-user\">Add User</a></p>";
-    } 
-    if (UserCan($user,"manage-users")) { 
-      print "<p><a href=\"rwb.pl?act=delete-user\">Delete User</a></p>";
-      print "<p><a href=\"rwb.pl?act=add-perm-user\">Add User Permission</a></p>";
-      print "<p><a href=\"rwb.pl?act=revoke-perm-user\">Revoke User Permission</a></p>";
-    }
-    print "<p><a href=\"rwb.pl?act=logout&run=1\">Logout</a></p>";
-  }
-
 }
 
 #
@@ -474,11 +505,98 @@ if ($action eq "near") {
 
 
 if ($action eq "invite-user") { 
-  print h2("Invite User Functionality Is Unimplemented");
+  print "<script src=\"bootstrap.js\" type=\"text/javascript\"></script>";
+  print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";
+  print h2("Invite User");
+
+  # Get list of available permissions
+  my @permissions_data;
+  eval { @permissions_data = ExecSQL($dbuser, $dbpasswd, "select action from RWB_PERMISSIONS where name='$user'", "COL"); };
+
+  # Display HTML form
+  print start_form(-name=>'invite'),p,p,
+  "Email: ", textfield(-name=>'email'),p,
+  hidden(-name=>'run',default=>['1']),
+  hidden(-name=>'act',default=>['invite-user']),h3("Select user permissions:"),
+  checkbox_group(-name=>'permissions_list',
+    -multiple=>'true',
+    -values=>[@permissions_data],
+    -linebreak=>'true'
+    ),p,
+  submit,
+  end_form;
+
+  if (defined(param("email"))) {
+
+    # Generate random auth_token for invitation
+    my $auth_token = rand();
+    eval { ExecSQL($dbuser,$dbpasswd,
+      "insert into rwb_invites (nonce) values (?)",undef, $auth_token);};
+
+    # Get inputted Email address and selected permissions
+    my $email_input = param("email");
+    my $permissions_input = join(',', param('permissions_list'));
+
+    # Build SMTP Email
+    my $message_headers = "Content-Type: text/html\nTo: " . $email_input . "\n" . "Subject: You have been invited to Red, White, and Blue\n\n";
+    my $message_body = "<h2>Hello!</h2><br/><h3>$user has invited you to RWB on Murphy!</h3><p><a href=\"http://". $ENV{'HTTP_HOST'} ."/~hsb732/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input\">Click here to join.</a></p>";
+    my $message_permissions = "<br/><div id=\"permissions\" style=\"font-size:8px;\"><p>Your permissions:</p><p>" . $permissions_input . "</p></div>";
+    my $message_content = $message_headers . $message_body . $message_permissions;
+
+    # Create SMTP email
+    use Net::SMTP;
+    my $email_obj = Net::SMTP->new('localhost');
+
+    # Send Email
+    $email_obj->mail($ENV{USER});
+    $email_obj->to($email_input);
+    $email_obj->data();
+    $email_obj->datasend($message_content);
+    $email_obj->dataend();
+    print "<div class=\"alert alert-success\" style=\"width:50%;\">Email was sent!</div>";
+  }
+  else {   # if email is not defined
+    print "<div class=\"alert alert-error\" style=\"width:50%;\">Email is not entered.</div>";
+  }
 }
 
 if ($action eq "give-opinion-data") { 
-  print h2("Giving Location Opinion Data Is Unimplemented");
+  if (!UserCan($user,"add-users") && !UserCan($user,"manage-users")) { 
+    print h2('You do not have the required permissions to add users.');
+  } else {
+    if (!$run) { 
+      my $lat = param('lat');
+      my $long = param('long');
+      print start_form(-name=>'GiveOpinion'),
+  h2('Give Opinion'),
+    "Color: ", textfield(-name=>'color'),
+      p('Color must be between -1 (red) and +1 (blue).'),
+      hidden(-name=>'run',-default=>['1']),
+      hidden(-name=>'act',-default=>['give-opinion-data']),
+      hidden(-name=>'lat',-default=>[$lat]),
+      hidden(-name=>'long',-default=>[$long]),
+        submit,
+          end_form,
+            hr;
+    } else {
+      my $color = param('color');
+      my $lat = param('lat');
+      my $long = param('long');
+
+      my $error;
+      if ($error) { 
+        print "Can't add user because: $error";
+      } else {
+        if ($color > 1 || $color < -1) {
+          print "Color must be between -1 and 1";
+        } else {
+          ExecSQL($dbuser, $dbpasswd, "insert into rwb_opinions (submitter, color, latitude, longitude) values (?, ?, ?, ?)", undef, $user, $color, $lat, $long);
+          print "Inserted opinion of $color at latitude: $lat and longitude: $long";
+        }
+      }
+    }
+  }
+  print "<p><a href=\"rwb.pl?act=base&run=1\">Return</a></p>";
 }
 
 if ($action eq "give-cs-ind-data") { 
@@ -555,7 +673,7 @@ if ($action eq "delete-user") {
     } else {
       my $name=param('name');
       my $error;
-      $error=UserDelete($name);
+      $error=UserDel($name);
       if ($error) { 
 	print "Can't delete user because: $error";
       } else {

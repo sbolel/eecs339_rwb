@@ -1,4 +1,25 @@
-Welcome to Red, White, and Blue
+# EECS339 - Red, White and Blue
+
+### Project Details
+* Course: EECS 339
+  * Instructor: Goce Trajcevski
+  * Quarter: Winter 2014
+* Authors:
+  * Sinan Bolel
+  * Elaine Chang
+  * Patrick Weston
+
+### Assignment
+1. Extending queries (40%)
+2. Crowdsourcing opinions (30%)
+3. Aggregated view (30%)
+
+
+
+
+# Original README
+
+### Welcome to Red, White, and Blue
 
 (c) 2012 Peter A. Dinda, pdinda@northwestern.edu
 
