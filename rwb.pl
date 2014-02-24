@@ -265,20 +265,14 @@ print "</head>";
 
 print "<body style=\"height:100\%;margin:0\">";
 
-#
 # Force device width, for mobile phones, etc
-#
-#print "<meta name=\"viewport\" content=\"width=device-width\" />\n";
+print "<meta name=\"viewport\" content=\"width=device-width\" />\n";
 
-# This tells the web browser to render the page in the style
-# defined in the css file
-#
-  print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";  
+# Import Bootstrap CSS
+print "<style type=\"text/css\">\n\@import \"bootstrap.min.css\";\n</style>\n";  
 # print "<style type=\"text/css\">\n\@import \"rwb.css\";\n</style>\n";
-  
 
 print "<center>" if !$debug;
-
 
 #
 #
@@ -321,27 +315,31 @@ if ($action eq "login") {
 #
 #
 if ($action eq "base") { 
-  #
-  # Google maps API, needed to draw the map
-  #
+
+  # jQuery 1.7
   print "<script src=\"http://code.jquery.com/jquery-1.7.min.js\" type=\"text/javascript\"></script>";
+  # Google maps API, needed to draw the map
   print "<script src=\"http://maps.google.com/maps/api/js?sensor=false\" type=\"text/javascript\"></script>";
+  # Bootstrap
   print "<script src=\"bootstrap.js\" type=\"text/javascript\"></script>";
-  #
-  # The Javascript portion of our app
-  #
+  # rwb js
   print "<script type=\"text/javascript\" src=\"rwb.js\"> </script>";
 
+  #
+  # BOOTSTRAP NAVBAR
+  # Show user menu dropdown with user mods 
+  #
   if ($user eq "anon") {
-  print "<div class=\"navbar\">
-          <div class=\"navbar-inner\">
-            <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
-            <ul class=\"nav\">
-              <li class=\"pull-right\"><a href=\"rwb.pl?act=login\">Login</a></li>
-            </ul>
-          </div>
-        </div>";
-  } else {
+    print "<div class=\"navbar\">
+            <div class=\"navbar-inner\">
+              <a class=\"brand active\" href=\"rwb.pl\">RWB</a>
+              <ul class=\"nav\">
+                <li class=\"pull-right\"><a href=\"rwb.pl?act=login\">Login</a></li>
+              </ul>
+            </div>
+          </div>";
+  } 
+  else {
     my $user_mod_html = " ";
     if (UserCan($user,"give-opinion-data")) {
       $user_mod_html = $user_mod_html . "<li><a id=\"give-opinion-link\" href=\"rwb.pl?act=give-opinion-data\">Give Opinion Of Current Location</a></li>";
@@ -375,14 +373,7 @@ if ($action eq "base") {
             </div>
           </div>
         </div>";
-  }
-
-  #
-  # User mods
-  #
-  #
-
-
+    }
 
   #
   #
