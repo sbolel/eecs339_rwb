@@ -401,7 +401,7 @@ if ($action eq "base") {
   #Filter map options 
   print "<h5>Filter data options:</h5> <p>";
   
-  print start_form(-name=>'Data Filters'), 
+  print start_form(-name=>'Data Filters'),
   checkbox(-name=>'committee',-id=>'committee',-value=>'yes',-selected=>0,-label=>'Committee Data'),
   checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
   checkbox(-name=>'candidate',-id=>'candidate',-value=>'yes',-selected=>0,-label=>'Candidate Data'),
@@ -418,12 +418,12 @@ if ($action eq "base") {
 my @cycles = ExecSQL($dbuser, $dbpasswd, "select distinct cycle from cs339.committee_master natural join cs339.cmte_id_to_geo order by cycle DESC");
 
 print "<h5>Election Cycles:</h5> <p>";
-# I tried to use the Perl form, but Perl sucks and it confused me -- PW
-print '<form method="post" action="/~pfw495/rwb/rwb.pl" enctype="multipart/form-data" name="Election Cycles" id="election-cycle-checkboxes">';
+
+print start_form(-name=>'Election Cycles',-id=>'election-cycle-checkboxes');
 foreach (@cycles) {
-  print "<label><input type=\"checkbox\" name=\"@{$_}\" value=\"@{$_}\" id=\"committee\">@{$_}</label><label>";
+  print checkbox(-name=>@{$_},-id=>'committee',-value=>@{$_},-selected=>0,-label=>@{$_});
 }
-print '</form>';
+print end_form;
 
 print "</div>";
 
