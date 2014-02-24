@@ -21,7 +21,7 @@ function componentToHex(c) {
 }
 function rgbToHex(r, g, b) {
 // Source: http://stackoverflow.com/a/5624139
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    return componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 
@@ -36,26 +36,35 @@ function UpdateMapById(id, tag) {
     var cols = rows[i].split("\t");
     var lat = cols[0];
     var long = cols[1];
+
     if (tag=="OPINION") {
-      var color = cols[2];
-      if (color<0){ // Opinion is red
-        var rgb = new Array(Math.round(color*-1*255),0,0);
+      if (cols[2]<0){ // Opinion is red
+        var rgb = new Array(Math.round(cols[2]*-1*255),0,0);
       }
-      else if (color>0){ // Opinion is blue
-        var rgb = new Array(0,0,Math.round(color*255));
+      else if (cols[2]>0){ // Opinion is blue
+        var rgb = new Array(0,0,Math.round(cols[2]*255));
       }
       else { // Opinion is nothing
         var rgb = new Array(0,255,0);
       }
-      var hex = rgbToHex(rgb[0],rgb[1],rgb[2]);
-      console.log("COLOR: "+hex+"/"+rgb[0].toString()+"-"+rgb[1].toString()+"-"+rgb[2].toString());
+      var pinColor = rgbToHex(rgb[0],rgb[1],rgb[2]);
+      // console.log("COLOR: "+hex+"/"+rgb[0].toString()+"-"+rgb[1].toString()+"-"+rgb[2].toString());
+      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+    } else {
+      var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + "eeeeee",
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34)); 
     }
 
     console.log("Updating index: " + i.toString());
 
 	  markers.push(new google.maps.Marker({ map:map,
 						    position: new google.maps.LatLng(lat,long),
-						    title: tag+"\n"+cols.join("\n")}));
+						    icon: pinImage, title: tag+"\n"+cols.join("\n")}));
 	
     }
   }
