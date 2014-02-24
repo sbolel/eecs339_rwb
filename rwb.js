@@ -14,6 +14,16 @@ if (navigator.geolocation)  {
     navigator.geolocation.getCurrentPosition(Start);
 }
 
+function componentToHex(c) {
+// Source: http://stackoverflow.com/a/5624139
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+// Source: http://stackoverflow.com/a/5624139
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 
 function UpdateMapById(id, tag) {
 
@@ -21,17 +31,29 @@ function UpdateMapById(id, tag) {
   if (target != null) {
     var data = target.innerHTML;
     console.log("Data: " + data.toString());
-
     var rows  = data.split("\n");
-
     for (i in rows) {
     var cols = rows[i].split("\t");
     var lat = cols[0];
     var long = cols[1];
+    if (tag=="OPINION") {
+      var color = cols[2];
+      if (color<0){ // Opinion is red
+        var rgb = new Array(Math.round(color*-1*255),0,0);
+      }
+      else if (color>0){ // Opinion is blue
+        var rgb = new Array(0,0,Math.round(color*255));
+      }
+      else { // Opinion is nothing
+        var rgb = new Array(0,255,0);
+      }
+      var hex = rgbToHex(rgb[0],rgb[1],rgb[2]);
+      console.log("COLOR: "+hex+"/"+rgb[0].toString()+"-"+rgb[1].toString()+"-"+rgb[2].toString());
+    }
 
     console.log("Updating index: " + i.toString());
 
-	markers.push(new google.maps.Marker({ map:map,
+	  markers.push(new google.maps.Marker({ map:map,
 						    position: new google.maps.LatLng(lat,long),
 						    title: tag+"\n"+cols.join("\n")}));
 	
@@ -131,9 +153,12 @@ function Start(location)
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 				} );
 
-  usermark = new google.maps.Marker({ map:map,
+  usermark = new google.maps.Marker({ 
+              map:map,
 					    position: new google.maps.LatLng(lat,long),
-					    title: "You are here"});
+					    title: 'You are here',
+              icon: 'http://maps.google.com/mapfiles/marker_white.png'
+            });
 
   markers = new Array;
 

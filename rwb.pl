@@ -34,7 +34,7 @@
 #
 # database input and output is paired into the two arrays noted
 #
-my $debug=0; # default - will be overriden by a form parameter or cookie
+my $debug=1; # default - will be overriden by a form parameter or cookie
 my @sqlinput=();
 my @sqloutput=();
 
