@@ -20,7 +20,7 @@ function UpdateMapById(id, tag) {
   var target = document.getElementById(id);
   if (target != null) {
     var data = target.innerHTML;
-    console.log("Data: " + data.toString());
+    //console.log("Data: " + data.toString());
 
     var rows  = data.split("\n");
 
@@ -29,7 +29,7 @@ function UpdateMapById(id, tag) {
     var lat = cols[0];
     var long = cols[1];
 
-    console.log("Updating index: " + i.toString());
+    //console.log("Updating index: " + i.toString());
 
 	markers.push(new google.maps.Marker({ map:map,
 						    position: new google.maps.LatLng(lat,long),
@@ -48,6 +48,47 @@ function ClearMarkers()
 }
 
 
+function UpdateDisplay(id) {
+var target = document.getElementById(id);
+  if (target != null) {
+    var data = target.innerHTML;
+    var color = document.getElementById("color");
+    var rows  = data.split("\n");
+	var total = 0.00;
+	var dem = 0.00;
+	var rep = 0.00;
+console.log("initial total: " +total);
+    for (i in rows) {
+    var cols = rows[i].split("\t");
+    total += Number(cols[0]);
+console.log("temp total: " + total);
+	if (cols[1] == "DEM") dem = Number(cols[0]);
+	if (cols[1] == "REP") rep = Number(cols[0]);
+    }
+	console.log("total: " + total);
+	color.innerHTML+="<p>Total amount of money involved in current view: $" + total+"";
+	if (dem >= rep)  color.style.backgroundColor='blue';
+	else  color.style.backgroundColor='red';
+	}
+}
+
+function UpdateOpinionDisplay(id) {
+var target = document.getElementById(id);
+  if (target != null) {
+    var data = target.innerHTML;
+    var color = document.getElementById("color");
+    var rows  = data.split("\n");
+    var cols = rows[0].split("\t");
+        var average = Number(cols[1]);
+        var stddev = Number(cols[0]);
+        color.innerHTML+="<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
+        if (average > 0.0)  color.style.backgroundColor='blue';
+	else if (average == 0.0) color.style.backgroundColor='white';
+        else  color.style.backgroundColor='red';
+        }
+
+}
+
 function UpdateMap()
 {
     var color = document.getElementById("color");
@@ -62,25 +103,25 @@ function UpdateMap()
     UpdateMapById("individual_data", "INDIVIDUAL");
     UpdateMapById("opinion_data","OPINION");
 
-
     color.innerHTML="Ready";
-    
-    if (Math.random()>0.5) { 
+    UpdateDisplay("committee_analysis");
+    UpdateOpinionDisplay("opinion_analysis");
+    /*if (Math.random()>0.5) { 
 	color.style.backgroundColor='blue';
     } else {
 	color.style.backgroundColor='red';
-    }
+    }*/
 
 }
 
 function NewData(data)
 {
   var target = document.getElementById("data");
-  
+  if (target != null) {
   target.innerHTML = data;
 
   UpdateMap();
-
+}
 }
 
 function ViewShift()
@@ -168,7 +209,7 @@ function findCheckboxes() {
     if (what == "") { what += "individuals"; }
     else { what += ",individuals"; }
   }  
-  console.log(what);
+  //console.log(what);
   return what;
 }
 
@@ -176,7 +217,7 @@ function findCycles($cycles) {
   var cyclesArray = [];
   $cycles.each(function() {
     if ($(this).is(':checked')) {
-      console.log($(this));
+      //console.log($(this));
       var value = String($(this).val());
       cyclesArray.push(value);
     }
@@ -205,5 +246,5 @@ $filters.add($cycles).live('change', function() {
   var cycles = findCycles($("#election-cycle-checkboxes").find('input'));
 
   $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what+"&cycle="+cycles,NewData);
-  console.log("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what+"&cycle="+cycles);
+  //console.log("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what+"&cycle="+cycles);
 });
