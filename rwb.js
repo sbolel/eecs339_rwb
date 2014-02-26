@@ -152,11 +152,11 @@ function UpdateMap()
 function NewData(data)
 {
   var target = document.getElementById("data");
-  if (target != null) {
-  target.innerHTML = data;
+  if (target != null) { 
+    target.innerHTML = data;
 
-  UpdateMap();
-}
+    UpdateMap();
+  }
 }
 
 function ViewShift()
