@@ -57,16 +57,13 @@ var target = document.getElementById(id);
 	var total = 0.00;
 	var dem = 0.00;
 	var rep = 0.00;
-console.log("initial total: " +total);
     for (i in rows) {
     var cols = rows[i].split("\t");
     total += Number(cols[0]);
-console.log("temp total: " + total);
 	if (cols[1] == "DEM") dem = Number(cols[0]);
 	if (cols[1] == "REP") rep = Number(cols[0]);
     }
-	console.log("total: " + total);
-	color.innerHTML+="<p>Total amount of money involved in current view: $" + total+"";
+	color.innerHTML="<p>Total amount of money involved in current view: $" + total+"";
 	if (dem >= rep)  color.style.backgroundColor='blue';
 	else  color.style.backgroundColor='red';
 	}
@@ -81,7 +78,7 @@ var target = document.getElementById(id);
     var cols = rows[0].split("\t");
         var average = Number(cols[1]);
         var stddev = Number(cols[0]);
-        color.innerHTML+="<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
+        color.innerHTML="<p>Average color in current view: "+average+" <p> Standard deviation color in current view: "+stddev+"";
         if (average > 0.0)  color.style.backgroundColor='blue';
 	else if (average == 0.0) color.style.backgroundColor='white';
         else  color.style.backgroundColor='red';
@@ -93,8 +90,8 @@ function UpdateMap()
 {
     var color = document.getElementById("color");
     
-    color.innerHTML="<b><blink>Updating Display...</blink></b>";
-    color.style.backgroundColor='white';
+    //color.innerHTML="<b><blink>Updating Display...</blink></b>";
+    //color.style.backgroundColor='white';
 
     ClearMarkers();
 
@@ -103,9 +100,12 @@ function UpdateMap()
     UpdateMapById("individual_data", "INDIVIDUAL");
     UpdateMapById("opinion_data","OPINION");
 
-    color.innerHTML="Ready";
-    UpdateDisplay("committee_analysis");
-    UpdateOpinionDisplay("opinion_analysis");
+    if ($("#aopinion").is(':checked')) { UpdateOpinionDisplay("opinion_analysis"); }
+    if ($("#acommittee").is(':checked')) { UpdateDisplay("committee_analysis"); }
+
+    //color.innerHTML="Ready";
+    //UpdateDisplay("committee_analysis");
+    //UpdateOpinionDisplay("opinion_analysis");
     /*if (Math.random()>0.5) { 
 	color.style.backgroundColor='blue';
     } else {
@@ -196,19 +196,37 @@ function findCheckboxes() {
   if ($("#committee").is(':checked')) {
     if (what == "") { what += "committees"; }
     else { what += ",committees"; }
+    $("#acommittee").removeAttr("disabled");
   }
+  else {
+    $("#acommittee").attr("disabled", true);
+    $("#acommittee").attr("checked", false);
+  }
+  
   if ($("#opinion").is(':checked')) {
     if (what == "") { what += "opinions"; }
     else { what += ",opinions"; }
+    $("#aopinion").removeAttr("disabled");
   }
+  else {
+    $("#aopinion").attr("disabled", true);
+    $("#aopinion").attr("checked", false);
+  }
+
   if ($("#candidate").is(':checked')) {
     if (what == "") { what += "candidates"; }
     else { what += ",candidates"; }
   }
+
   if ($("#individual").is(':checked')) {
     if (what == "") { what += "individuals"; }
     else { what += ",individuals"; }
+    $("#aindividual").removeAttr("disabled");
   }  
+  else {
+    $("#aindividual").attr("disabled", true);
+    $("#aindividual").attr("checked", false);
+  }
   //console.log(what);
   return what;
 }
@@ -244,7 +262,31 @@ $filters.add($cycles).live('change', function() {
 
   var what = findCheckboxes();
   var cycles = findCycles($("#election-cycle-checkboxes").find('input'));
-
+  
   $.get("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what+"&cycle="+cycles,NewData);
   //console.log("rwb.pl?act=near&latne="+ne.lat()+"&longne="+ne.lng()+"&latsw="+sw.lat()+"&longsw="+sw.lng()+"&format=raw&what="+what+"&cycle="+cycles);
 });
+
+$("#aopinion").live('change', function() {
+  if ($("#aopinion").is(':checked')) {
+    UpdateOpinionDisplay("opinion_analysis"); 
+    $("#aindividual").attr("checked", false);
+    $("#acommittee").attr("checked", false);
+  }  
+});
+
+$("#acommittee").live('change', function() {
+  if ($("#acommittee").is(':checked')) {
+    UpdateDisplay("committee_analysis");
+    $("#aindividual").attr("checked", false);
+    $("#aopinion").attr("checked", false);
+  }
+});
+
+$("#aindividual").live('change', function() {
+  if ($("#aindividual").is(':checked')) {
+    $("#acommittee").attr("checked", false);
+    $("#aopinion").attr("checked", false);
+  }
+});
+

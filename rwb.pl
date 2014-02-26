@@ -408,6 +408,15 @@ if ($action eq "base") {
   checkbox(-name=>'individual',-id=>'individual',-value=>'yes',-selected=>0,-label=>'Individual Data'), 
   end_form;
 
+  print "<h5>Analyze data options:</h5><p>";
+  print start_form(-name=>'Analysis Filters'),
+  checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
+  checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
+  checkbox(-name=>'acandidate',-id=>'acandidate',-value=>'yes',-selected=>0,-label=>'Analyze Candidate Data',-disabled=>''),
+  checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Iindividual Data',-disabled=>''),
+  end_form;
+
+
 #  print start_form(-name=>'Cycle'),
 #  popup_menu(-name=>'cycle', id=>'cycle',
 #    -values => [],
@@ -892,7 +901,7 @@ sub CommitteesAnalysis {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval {
- my $query = "select sum(transaction_amnt), cmte_pty_affiliation from ( select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_comm where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? union select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_cand where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? ) group by cmte_pty_affiliation";
+ my $query = "select sum(transaction_amnt), cmte_pty_affiliation from ( select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_comm where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? union all select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_cand where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? ) group by cmte_pty_affiliation";
  @rows = ExecSQL($dbuser, $dbpasswd, $query, undef,$latsw,$latne,$longsw,$longne,$latsw,$latne,$longsw,$longne);
 
   
