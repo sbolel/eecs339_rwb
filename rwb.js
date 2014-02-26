@@ -54,22 +54,46 @@ var target = document.getElementById(id);
     var data = target.innerHTML;
     var color = document.getElementById("color");
     var rows  = data.split("\n");
-	var total = 0.00;
-	var dem = 0.00;
-	var rep = 0.00;
-console.log("initial total: " +total);
+    var total = 0.00;
+    var dem = 0.00;
+    var rep = 0.00;
+    console.log("initial total: " +total);
+    
     for (i in rows) {
-    var cols = rows[i].split("\t");
-    total += Number(cols[0]);
-console.log("temp total: " + total);
-	if (cols[1] == "DEM") dem = Number(cols[0]);
-	if (cols[1] == "REP") rep = Number(cols[0]);
+      var cols = rows[i].split("\t");
+      total += Number(cols[0]);
+      console.log("temp total: " + total);
+      if (cols[1] == "DEM") dem = Number(cols[0]);
+      if (cols[1] == "REP") rep = Number(cols[0]);
     }
-	console.log("total: " + total);
-	color.innerHTML+="<p>Total amount of money involved in current view: $" + total+"";
-	if (dem >= rep)  color.style.backgroundColor='blue';
-	else  color.style.backgroundColor='red';
+
+    console.log("total: " + total);
+    console.log("dem: " + dem + " rep: " + rep);
+    color.innerHTML+="<p>Total amount of money involved in current view: $" + total+"";
+    
+    color.style.backgroundColor = String(colorScale(dem, rep));
 	}
+}
+
+function colorScale(blue, red) {
+  var sum = blue + red;
+  if (sum === 0) return '#888888';
+
+  var blueColor = 255 * (blue / sum);
+  var redColor = 255 * (red / sum);
+
+  var rgb = blueColor | (0 << 8) | (redColor << 16);
+  var rgbString = rgb.toString(16)
+  var length = rgbString.length;
+  if (length < 6) {
+    var temp = "";
+    for (i = 0; i < 6 - length; i++) {
+      temp = temp + "0";
+    }
+    rgbString = temp + rgbString;
+  }
+  console.log('#' + rgbString);
+  return '#' + rgbString;
 }
 
 function UpdateOpinionDisplay(id) {
@@ -79,14 +103,22 @@ var target = document.getElementById(id);
     var color = document.getElementById("color");
     var rows  = data.split("\n");
     var cols = rows[0].split("\t");
-        var average = Number(cols[1]);
-        var stddev = Number(cols[0]);
-        color.innerHTML+="<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
-        if (average > 0.0)  color.style.backgroundColor='blue';
-	else if (average == 0.0) color.style.backgroundColor='white';
-        else  color.style.backgroundColor='red';
-        }
-
+    var average = Number(cols[1]);
+    var stddev = Number(cols[0]);
+    color.innerHTML+="<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
+    var colorVal = '';
+    if (average > 0.0) {
+      colorVal = "#0000" + parseInt(255*average).toString(16);
+    }
+    else if (average == 0.0) {
+      colorVal = '#ffffff';
+    }
+    else {
+      colorVal = "#" + parseInt(255*average*-1).toString(16) + "0000";
+    }
+    color.style.backgroundColor = String(colorVal);
+    console.log(colorVal);
+  }
 }
 
 function UpdateMap()
