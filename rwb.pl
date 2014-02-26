@@ -379,7 +379,7 @@ if ($action eq "base") {
   #
   # And something to color (Red, White, or Blue)
   #
-  print "<div id=\"color\" style=\"width:100\%; height:10\%\; color: #000\;\"></div>";
+  print "<div id=\"color\" style=\"width:100\%; height:10\%\; color: #777\;\"></div>";
 
   #
   #
@@ -400,11 +400,26 @@ if ($action eq "base") {
   end_form;
 
   print "<h5>Analyze data options:</h5><p>";
+  #print start_form(-name=>'Analysis Filters'),
+  #radiobutton(-name=>'acommittee', -id=>'acommittee', -value=>'yes', -selected=>0, -label=>'Analyze Committee Data', disabled=>''),
+  #end_form;
+#print radio_group(
+#        -name    => 'analyze',
+#        -values  => ['acommittee', 'aopinion', 'aindividual',],
+#        -labels  => 'Analyze Committee Data',#, 'Analyze Opinion Data', 'Analyze Individual Data',},
+#        -columns => 1,
+#        -rows    => 3,
+#    );
+
+
+
+  #radio_button(-name=>'analyze', -values=>['acommittee', 'aindividual', 'aopinion'], -labels=>['Analyze Committee Data', 'Analyze Individual Data', 'Analyze Opinion Data']),
+  
   print start_form(-name=>'Analysis Filters'),
   checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
   checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
   checkbox(-name=>'acandidate',-id=>'acandidate',-value=>'yes',-selected=>0,-label=>'Analyze Candidate Data',-disabled=>''),
-  checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Iindividual Data',-disabled=>''),
+  checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
   end_form;
 
 

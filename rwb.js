@@ -102,7 +102,7 @@ var target = document.getElementById(id);
 
     console.log("total: " + total);
     console.log("dem: " + dem + " rep: " + rep);
-    color.innerHTML+="<p>Total amount of money involved in current view: $" + total+"";
+    color.innerHTML = "<p>Total amount of money involved in current view: $" + total+"";
     
     color.style.backgroundColor = String(colorScale(dem, rep));
 	}
@@ -138,7 +138,7 @@ var target = document.getElementById(id);
     var cols = rows[0].split("\t");
     var average = Number(cols[1]);
     var stddev = Number(cols[0]);
-    color.innerHTML+="<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
+    color.innerHTML = "<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
     var colorVal = '';
     if (average > 0.0) {
       colorVal = "#0000" + parseInt(255*average).toString(16);
