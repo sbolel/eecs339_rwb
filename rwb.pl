@@ -388,7 +388,7 @@ if ($action eq "base") {
   #
   # And something to color (Red, White, or Blue)
   #
-  print "<div id=\"color\" style=\"width:100\%; height:10\%\"></div>";
+  print "<div id=\"color\" style=\"width:100\%; height:10\%\; color: #000\;\"></div>";
 
   #
   #
