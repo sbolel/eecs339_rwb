@@ -170,6 +170,7 @@ function UpdateMap()
 
     if ($("#aopinion").is(':checked')) { UpdateOpinionDisplay("opinion_analysis"); }
     if ($("#acommittee").is(':checked')) { UpdateDisplay("committee_analysis"); }
+    if ($("#aindividual").is(':checked')) {UpdateDisplay("individual_analysis"); }
 
     //color.innerHTML="Ready";
     //UpdateDisplay("committee_analysis");

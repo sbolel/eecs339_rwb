@@ -912,8 +912,6 @@ sub CommitteesAnalysis {
   }
 }
 
-
-
 #
 # Generate a table of nearby candidates
 # ($table|$raw,$error) = Committees(latne,longne,latsw,longsw,cycle,format)
@@ -970,6 +968,24 @@ sub Individuals {
   }
 }
 
+sub IndividualsAnalysis {
+  my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
+  my @rows;
+  eval {
+    my $query =  "select sum(transaction_amnt), cmte_pty_affiliation from cs339.individual natural join cs339.ind_to_geo natural join cs339.committee_master where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? group by cmte_pty_affiliation";
+    @rows = ExecSQL($dbuser, $dbpasswd, $query, undef,$latsw,$latne,$longsw,$longne);
+  };
+
+  if ($@) {
+    return (undef,$@);
+  } else {
+    if ($format eq "table") {
+      return (MakeTable("individual_analysis","2D", ["amount", "party"], @rows),$@);
+    } else {
+      return (MakeRaw("individual_analysis","2D",@rows),$@);
+    }
+  }
+}
 
 #
 # Generate a table of nearby opinions
