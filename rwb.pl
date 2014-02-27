@@ -1021,13 +1021,13 @@ sub OpinionsAnalysis {
       @rows = ExecSQL($dbuser, $dbpasswd, "select stddev(color),avg(color),count(color) from rwb_opinions where latitude>? and latitude<? and longitude>? and longitude<?",undef,$latsw,$latne,$longsw,$longne);
     };
 
-  print join(", ", @rows);
   # } while (@rows[2]<5);
   # At least 5 points needed for analysis
 
   if ($@) {
     return (undef,$@);
   } else {
+    print "$rows[0][2]\n"; # [SEEHERE]
     if ($format eq "table") {
       return (MakeTable("opinion_analysis","2D",
                         ["stddev", "average","count"],
