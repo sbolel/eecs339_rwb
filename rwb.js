@@ -85,7 +85,7 @@ function UpdateDisplay(id) {
 var target = document.getElementById(id);
   if (target != null) {
     var data = target.innerHTML;
-    var color = document.getElementById("color");
+    var color = document.getElementById("analysis");
     var rows  = data.split("\n");
     var total = 0.00;
     var dem = 0.00;
@@ -133,12 +133,13 @@ function UpdateOpinionDisplay(id) {
 var target = document.getElementById(id);
   if (target != null) {
     var data = target.innerHTML;
-    var color = document.getElementById("color");
+    var color = document.getElementById("analysis");
     var rows  = data.split("\n");
     var cols = rows[0].split("\t");
     var average = Number(cols[1]);
     var stddev = Number(cols[0]);
-    color.innerHTML = "<p>Average color in current view: "+average+" | Standard deviation color in current view: "+stddev+"";
+    var number = Number(cols[2]);
+    color.innerHTML = "<p>Average color of <strong>"+number+"</strong> points in current view: "+average+" <br/> Standard deviation color in current view: "+stddev+"";
     var colorVal = '';
     if (average > 0.0) {
       colorVal = "#0000" + parseInt(255*average).toString(16);

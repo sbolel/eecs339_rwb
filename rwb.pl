@@ -37,7 +37,6 @@
 my $debug=1; # default - will be overriden by a form parameter or cookie
 my @sqlinput=();
 my @sqloutput=();
-
 #
 # The combination of -w and use strict enforces various 
 # rules that make the script more resilient and easier to run
@@ -379,7 +378,8 @@ if ($action eq "base") {
   #
   # And something to color (Red, White, or Blue)
   #
-  print "<div id=\"color\" style=\"width:100\%; height:10\%\; color: #777\;\"></div>";
+  print "<div id=\"color\" style=\"width:100\%; height:5\%\; color: #777\;\"></div>";
+  print "<div id=\"analysis\" style=\"width:100\%; height:5\%\; color: #777\;\"></div></div>";
 
   #
   #
@@ -403,7 +403,7 @@ if ($action eq "base") {
   print start_form(-name=>'Analysis Filters'),
   checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
   checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
-#  checkbox(-name=>'acandidate',-id=>'acandidate',-value=>'yes',-selected=>0,-label=>'Analyze Candidate Data',-disabled=>''),
+ checkbox(-name=>'acandidate',-id=>'acandidate',-value=>'yes',-selected=>0,-label=>'Analyze Candidate Data',-disabled=>''),
   checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
   end_form;
 
@@ -1016,16 +1016,21 @@ sub Opinions {
 sub OpinionsAnalysis {
   my ($latne, $longne, $latsw, $longsw, $cycle,$format) = @_;
   my @rows;
-  eval {
-    @rows = ExecSQL($dbuser, $dbpasswd, "select stddev(color),avg(color) from rwb_opinions where latitude>? and latitude<? and longitude>? and longitude<?",undef,$latsw,$latne,$longsw,$longne);
-  };
+  # do {
+    eval {
+      @rows = ExecSQL($dbuser, $dbpasswd, "select stddev(color),avg(color),count(color) from rwb_opinions where latitude>? and latitude<? and longitude>? and longitude<?",undef,$latsw,$latne,$longsw,$longne);
+    };
+
+  print join(", ", @rows);
+  # } while (@rows[2]<5);
+  # At least 5 points needed for analysis
 
   if ($@) {
     return (undef,$@);
   } else {
     if ($format eq "table") {
       return (MakeTable("opinion_analysis","2D",
-                        ["stddev", "average"],
+                        ["stddev", "average","count"],
                         @rows),$@);
     } else {
       return (MakeRaw("opinion_analysis","2D",@rows),$@);
