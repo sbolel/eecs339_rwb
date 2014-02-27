@@ -392,6 +392,7 @@ if ($action eq "base") {
   #Filter map options 
   print "<h5>Filter data options:</h5> <p>";
   
+
   print start_form(-name=>'Data Filters'),
   checkbox(-name=>'committee',-id=>'committee',-value=>'yes',-selected=>0,-label=>'Committee Data'),
   checkbox(-name=>'opinion', -id=>'opinion',-value=>'yes', -selected=>0,-label=>'Opinion Data'),
@@ -400,11 +401,18 @@ if ($action eq "base") {
   end_form;
 
   print "<h5>Analyze data options:</h5><p>";
-  print start_form(-name=>'Analysis Filters'),
-  checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
-  checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
-  checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
-  end_form;
+  if (!UserCan($user,"query-opinion-data")) {
+    print start_form(-name=>'Analysis Filters'),
+    checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
+    checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
+    end_form;
+  } else {
+    print start_form(-name=>'Analysis Filters'),
+    checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
+    checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
+    checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
+    end_form;
+  }
 
 
 my @cycles = ExecSQL($dbuser, $dbpasswd, "select distinct cycle from cs339.committee_master natural join cs339.cmte_id_to_geo order by cycle DESC");
@@ -601,8 +609,8 @@ if ($action eq "invite-user") {
 }
 
 if ($action eq "give-opinion-data") { 
-   if (!UserCan($user,"give-opinion-link")) {
-    print h2('You do not have the required permissions to add users.');
+   if (!UserCan($user,"give-opinion-data")) {
+    print h2('You do not have the required permissions to give local opinions.');
   } else {
     if (!$run) { 
       my $lat = param('lat');
