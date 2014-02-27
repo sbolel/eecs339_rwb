@@ -601,7 +601,7 @@ if ($action eq "invite-user") {
 }
 
 if ($action eq "give-opinion-data") { 
-  if (!UserCan($user,"add-users") && !UserCan($user,"manage-users")) { 
+   if (!UserCan($user,"give-opinion-link")) {
     print h2('You do not have the required permissions to add users.');
   } else {
     if (!$run) { 
