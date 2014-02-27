@@ -129,6 +129,9 @@ function colorScale(blue, red) {
   return '#' + rgbString;
 }
 
+// Global variable
+opinionIncrement = 0;
+
 function UpdateOpinionDisplay(id) {
 var target = document.getElementById(id);
   if (target != null) {
@@ -138,20 +141,50 @@ var target = document.getElementById(id);
     var cols = rows[0].split("\t");
     var average = Number(cols[1]);
     var stddev = Number(cols[0]);
-    var number = Number(cols[2]);
-    color.innerHTML = "<p>Average color of <strong>"+number+"</strong> points in current view: "+average+" <br/> Standard deviation color in current view: "+stddev+"";
-    var colorVal = '';
-    if (average > 0.0) {
-      colorVal = "#0000" + parseInt(255*average).toString(16);
+    var numberOfOpinions = Number(cols[2]);
+
+    if (numberOfOpinions > 1) {
+      console.log(numberOfOpinions + "   " + opinionIncrement);
+
+      opinionIncrement = 0;
+      color.innerHTML = "<p>Average color of <strong>"+numberOfOpinions+"</strong> points in current view: "+average+" <br/> Standard deviation color in current view: "+stddev+"";
+      var colorVal = '';
+      if (average > 0.0) {
+        colorVal = "#0000" + parseInt(255*average).toString(16);
+      }
+      else if (average == 0.0) {
+        colorVal = '#ffffff';
+      }
+      else {
+        colorVal = "#" + parseInt(255*average*-1).toString(16) + "0000";
+      }
+      color.style.backgroundColor = String(colorVal);
+    } else {
+      opinionIncrement += 0.01;
+      // We need to fetch opinions outside of the viewing area to color
+      var bounds = map.getBounds();
+      var ne = bounds.getNorthEast();
+      var sw = bounds.getSouthWest();
+
+      var what = findCheckboxes();
+      var cycles = findCycles($("#election-cycle-checkboxes").find('input'));
+
+      var neLat = Number(ne.lat());
+      if (neLat > 0) {neLat += opinionIncrement} else {neLat -= opinionIncrement;}
+
+      var neLng = Number(ne.lng());
+      if (neLng > 0) {neLng += opinionIncrement} else {neLng -= opinionIncrement;}
+
+      var swLat = Number(sw.lat());
+      if (swLat > 0) {swLat -= opinionIncrement} else {swLat += opinionIncrement;}
+
+      var swLng = Number(sw.lng());
+      if (swLng > 0) {swLng -= opinionIncrement} else {swLng += opinionIncrement;}
+
+      $.get("rwb.pl?act=near&latne="+neLat+"&longne="+neLng+"&latsw="+swLat+"&longsw="+swLng+"&format=raw&what="+what+"&cycle="+cycles,NewData);
+
+      console.log("rwb.pl?act=near&latne="+neLat+"&longne="+neLng+"&latsw="+swLat+"&longsw="+swLng+"&format=raw&what="+what+"&cycle="+cycles);
     }
-    else if (average == 0.0) {
-      colorVal = '#ffffff';
-    }
-    else {
-      colorVal = "#" + parseInt(255*average*-1).toString(16) + "0000";
-    }
-    color.style.backgroundColor = String(colorVal);
-    console.log(colorVal);
   }
 }
 
