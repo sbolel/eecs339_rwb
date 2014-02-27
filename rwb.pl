@@ -531,21 +531,23 @@ if ($action eq "near") {
       }
     }
   }
-  if ($what{opinions}) {
-    my ($str,$error) = Opinions($latne,$longne,$latsw,$longsw,$cycle,$format);
-    if (!$error) {
-      if ($format eq "table") { 
-	print "<h2>Nearby opinions</h2>$str";
-      } else {
-	print $str;
+  if (UserCan($user,"query-opinion-data")) {
+    if ($what{opinions}) {
+      my ($str,$error) = Opinions($latne,$longne,$latsw,$longsw,$cycle,$format);
+      if (!$error) {
+        if ($format eq "table") { 
+  	print "<h2>Nearby opinions</h2>$str";
+        } else {
+  	print $str;
+        }
       }
-    }
-    my ($str1,$error1) = OpinionsAnalysis($latne,$longne,$latsw,$longsw,$cycle,$format);
-    if (!$error1) {
-      if ($format eq "table") {
-        print "<h2>Opinions Analysis</h2>$str1";
-      } else {
-        print $str1;
+      my ($str1,$error1) = OpinionsAnalysis($latne,$longne,$latsw,$longsw,$cycle,$format);
+      if (!$error1) {
+        if ($format eq "table") {
+          print "<h2>Opinions Analysis</h2>$str1";
+        } else {
+          print $str1;
+        }
       }
     }
   }
@@ -587,7 +589,7 @@ if ($action eq "invite-user") {
 
     # Build SMTP Email
     my $message_headers = "Content-Type: text/html\nTo: " . $email_input . "\n" . "Subject: You have been invited to Red, White, and Blue\n\n";
-    my $message_body = "<h2>Hello!</h2><br/><h3>$user has invited you to RWB on Murphy!</h3><p><a href=\"http://". $ENV{'HTTP_HOST'} ."/~hsb732/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input\">Click here to join.</a></p>";
+    my $message_body = "<h2>Hello!</h2><br/><h3>$user has invited you to RWB on Murphy!</h3><p><a href=\"http://". $ENV{'HTTP_HOST'} ."/~pfw495/rwb/rwb.pl?act=add-user&n=$auth_token&ref=$user&perm=$permissions_input\">Click here to join.</a></p>";
     my $message_permissions = "<br/><div id=\"permissions\" style=\"font-size:8px;\"><p>Your permissions:</p><p>" . $permissions_input . "</p></div>";
     my $message_content = $message_headers . $message_body . $message_permissions;
 
