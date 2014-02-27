@@ -893,21 +893,28 @@ sub CommitteesAnalysis {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval {
- my $query = "select sum(transaction_amnt), cmte_pty_affiliation from ( select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_comm where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? union all select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_cand where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? ) group by cmte_pty_affiliation";
+ my $query = "select sum(transaction_amnt), cmte_pty_affiliation, count(transaction_amnt) from ( select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_comm where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? union all select transaction_amnt, cmte_pty_affiliation from cs339.committee_master natural join cs339.cmte_id_to_geo natural join cs339.comm_to_cand where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? ) group by cmte_pty_affiliation";
  @rows = ExecSQL($dbuser, $dbpasswd, $query, undef,$latsw,$latne,$longsw,$longne,$latsw,$latne,$longsw,$longne);
 
   
 };
 
-  if ($@) {
+if ($@) {
     return (undef,$@);
   } else {
-    if ($format eq "table") {
-      return (MakeTable("committee_analysis","2D",
-                        ["amount", "party"],
-                        @rows),$@);
-    } else {
-      return (MakeRaw("committee_analysis","2D",@rows),$@);
+    my $count = $rows[0][2];
+    if ($count<5) {
+      &CommitteesAnalysis($latne+0.001, $longne+0.001, $latsw-0.001, $longsw-0.001, $cycle,$format);
+    }
+    else {
+      print "$count\n";
+      if ($format eq "table") {
+        return (MakeTable("committee_analysis","2D",
+                          ["stddev", "average","count"],
+                          @rows),$@);
+      } else {
+        return (MakeRaw("committee_analysis","2D",@rows),$@);
+      }
     }
   }
 }
@@ -972,17 +979,26 @@ sub IndividualsAnalysis {
   my ($latne,$longne,$latsw,$longsw,$cycle,$format) = @_;
   my @rows;
   eval {
-    my $query =  "select sum(transaction_amnt), cmte_pty_affiliation from cs339.individual natural join cs339.ind_to_geo natural join cs339.committee_master where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? group by cmte_pty_affiliation";
+    my $query =  "select sum(transaction_amnt), cmte_pty_affiliation, count(FILE_NUM) from cs339.individual natural join cs339.ind_to_geo natural join cs339.committee_master where " . $cycle . " and latitude>? and latitude<? and longitude>? and longitude<? group by cmte_pty_affiliation";
     @rows = ExecSQL($dbuser, $dbpasswd, $query, undef,$latsw,$latne,$longsw,$longne);
   };
 
   if ($@) {
     return (undef,$@);
   } else {
-    if ($format eq "table") {
-      return (MakeTable("individual_analysis","2D", ["amount", "party"], @rows),$@);
-    } else {
-      return (MakeRaw("individual_analysis","2D",@rows),$@);
+    my $count = $rows[0][2];
+    if ($count < 5) {
+      &IndividualsAnalysis($latne+0.001, $longne+0.001, $latsw-0.001, $longsw-0.001, $cycle,$format);
+    }
+    else {
+      print "$count\n";
+      if ($format eq "table") {
+        return (MakeTable("individual_analysis","2D",
+                          ["stddev", "average","count"],
+                          @rows),$@);
+      } else {
+        return (MakeRaw("individual_analysis","2D",@rows),$@);
+      }
     }
   }
 }
