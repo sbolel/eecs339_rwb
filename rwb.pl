@@ -1028,15 +1028,18 @@ sub OpinionsAnalysis {
     return (undef,$@);
   } else {
     my $count = $rows[0][2];
-    if ($count<5) { &OpinionsAnalysis($latne+0.001, $longne+0.001, $latsw-0.001, $longsw-0.001, $cycle,$format); }
-    print "$count\n";
-
-    if ($format eq "table") {
-      return (MakeTable("opinion_analysis","2D",
-                        ["stddev", "average","count"],
-                        @rows),$@);
-    } else {
-      return (MakeRaw("opinion_analysis","2D",@rows),$@);
+    if ($count<5) {
+      &OpinionsAnalysis($latne+0.001, $longne+0.001, $latsw-0.001, $longsw-0.001, $cycle,$format);
+    }
+    else {
+      print "$count\n";
+      if ($format eq "table") {
+        return (MakeTable("opinion_analysis","2D",
+                          ["stddev", "average","count"],
+                          @rows),$@);
+      } else {
+        return (MakeRaw("opinion_analysis","2D",@rows),$@);
+      }
     }
   }
 }
