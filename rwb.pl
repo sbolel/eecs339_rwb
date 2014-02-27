@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-#
+# Sinan Bolel, Elaine Chang, Patrick Weston
 #
 # rwb.pl (Red, White, and Blue)
 #
