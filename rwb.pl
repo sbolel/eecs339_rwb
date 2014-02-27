@@ -403,7 +403,6 @@ if ($action eq "base") {
   print start_form(-name=>'Analysis Filters'),
   checkbox(-name=>'acommittee',-id=>'acommittee',-value=>'yes',-selected=>0,-label=>'Analyze Committee Data',-disabled=>''),
   checkbox(-name=>'aopinion', -id=>'aopinion',-value=>'yes', -selected=>0,-label=>'Analyze Opinion Data',-disabled=>''),
- checkbox(-name=>'acandidate',-id=>'acandidate',-value=>'yes',-selected=>0,-label=>'Analyze Candidate Data',-disabled=>''),
   checkbox(-name=>'aindividual',-id=>'aindividual',-value=>'yes',-selected=>0,-label=>'Analyze Individual Data',-disabled=>''),
   end_form;
 
