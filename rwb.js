@@ -14,6 +14,13 @@ if (navigator.geolocation)  {
     navigator.geolocation.getCurrentPosition(Start);
 }
 
+var done1 = true;
+var done2 = true;
+var done3 = true;
+var done4 = true;
+var doneall = true;
+
+
 function componentToHex(c) {
 // Source: http://stackoverflow.com/a/5624139
     var hex = c.toString(16);
@@ -26,6 +33,20 @@ function rgbToHex(r, g, b) {
 
 
 function UpdateMapById(id, tag) {
+
+  if (tag=="COMMITTEE") {
+    done1=false;
+  }
+  if (tag=="CANDIDATE") {
+    done2=false;
+  }
+  if (tag=="INDIVIDUAL") {
+    done3=false;
+  }
+  if (tag=="OPINION") {
+    done4=false;
+  }
+
 
   var target = document.getElementById(id);
   if (target != null) {
@@ -70,6 +91,20 @@ function UpdateMapById(id, tag) {
 	
     }
   }
+
+  if (tag=="COMMITTEE") {
+    done1=true;
+  }
+  if (tag=="CANDIDATE") {
+    done2=true;
+  }
+  if (tag=="INDIVIDUAL") {
+    done3=true;
+  }
+  if (tag=="OPINION") {
+    done4=true;
+  }
+
 }
 
 function ClearMarkers()
@@ -159,7 +194,7 @@ function UpdateMap()
 {
     var color = document.getElementById("color");
     
-    //color.innerHTML="<b><blink>Updating Display...</blink></b>";
+    color.innerHTML="<b><blink>Updating Display...</blink></b>";
     //color.style.backgroundColor='white';
 
     ClearMarkers();
@@ -169,9 +204,19 @@ function UpdateMap()
     UpdateMapById("individual_data", "INDIVIDUAL");
     UpdateMapById("opinion_data","OPINION");
 
-    if ($("#aopinion").is(':checked')) { UpdateOpinionDisplay("opinion_analysis"); }
-    if ($("#acommittee").is(':checked')) { UpdateDisplay("committee_analysis"); }
-    if ($("#aindividual").is(':checked')) {UpdateDisplay("individual_analysis"); }
+    if ($("#aopinion").is(':checked')) {
+      UpdateOpinionDisplay("opinion_analysis");
+    }
+    if ($("#acommittee").is(':checked')) {
+      UpdateDisplay("committee_analysis");
+    }
+    if ($("#aindividual").is(':checked')) {
+      UpdateDisplay("individual_analysis");
+    }
+
+    if ((done1==true)&&(done2==true)&&(done3==true)&&(done4==true)) {
+      color.innerHTML="Ready";
+    }
 
     //color.innerHTML="Ready";
     //UpdateDisplay("committee_analysis");
